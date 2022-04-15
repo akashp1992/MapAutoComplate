@@ -28,8 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.akash.googleapidemo.Adapter.PlaceAutocompleteAdapter;
 import com.google.android.gms.common.SupportErrorDialogFragment;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
