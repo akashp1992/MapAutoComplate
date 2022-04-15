@@ -1,5 +1,7 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
 }
 
 android {
@@ -7,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.akash.googleapidemo"
-        minSdk 21
+        minSdk 19
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -40,10 +42,10 @@ dependencies {
     //GMap
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'com.google.android.gms:play-services-location:19.0.1'
-    implementation 'com.google.android.gms:play-services-places:17.0.0'
     implementation 'com.google.android.libraries.places:places:2.6.0'
+
     //SearchBar
-    implementation 'com.github.mancj:MaterialSearchBar:0.8.5'
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.1'
     //RippleBG When Pin
     implementation 'com.skyfishjy.ripplebackground:library:1.0.1'
 }

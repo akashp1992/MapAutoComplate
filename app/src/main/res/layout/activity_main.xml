@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity">
 
     <fragment
@@ -43,8 +42,5 @@
         app:mt_maxSuggestionsCount="10"
         app:mt_navIconEnabled="true"
         app:mt_placeholder="Search a place"
-        app:mt_speechMode="false" />
-
-
-
+        app:mt_speechMode="true" />
 </RelativeLayout>

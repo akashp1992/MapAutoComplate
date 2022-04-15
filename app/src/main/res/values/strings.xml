@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GoogleApiDemo</string>
-    <string name="google_maps_key">AIzaSyAdv4IwlCrGqxCx4TMXJqgnNWiSCU4OyGg</string>
+    <string name="google_maps_key">AIzaSyBKSNYiFf_S1k0h3zhbABWICCvUD75NLXs</string>
     <string name="service_not_available">Service not available ..check network connection</string>
     <string name="no_address_found">No address found</string>
     <string name="address_found">address found</string>

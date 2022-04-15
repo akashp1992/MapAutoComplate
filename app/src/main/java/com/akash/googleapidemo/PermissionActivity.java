@@ -41,7 +41,7 @@ public class PermissionActivity extends AppCompatActivity {
         btnGrant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dexter.withActivity(PermissionActivity.this)
+                Dexter.withContext(PermissionActivity.this)
                         .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                         .withListener(new PermissionListener() {
                             @Override

@@ -20,18 +20,19 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.akash.googleapidemo.utils.CustomButton;
-import com.akash.googleapidemo.utils.CustomTextView;
-import com.akash.googleapidemo.utils.FetchAddressIntentService;
-import com.akash.googleapidemo.utils.SimplePlacePicker;
+import com.akash.googleapidemo.Adapter.PlaceAutocompleteAdapter;
 import com.google.android.gms.common.SupportErrorDialogFragment;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -47,6 +48,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -62,6 +64,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
 import com.skyfishjy.library.RippleBackground;
@@ -69,7 +72,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback  {
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private PlacesClient placesClient;
@@ -100,7 +103,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = mapFragment.getView();
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
-        Places.initialize(MainActivity.this, getString(R.string.google_maps_key));
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyD0CSdY7uisKjY-kwmEUPtzHnHjvxk2Gj8");
+        }
         placesClient = Places.createClient(this);
         final AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
@@ -120,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (buttonCode == MaterialSearchBar.BUTTON_NAVIGATION) {
                     //opening or closing a navigation drawer
                 } else if (buttonCode == MaterialSearchBar.BUTTON_BACK) {
-                    materialSearchBar.closeSearch();
+                    materialSearchBar.disableSearch();
                 }
             }
         });
@@ -134,10 +139,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 FindAutocompletePredictionsRequest predictionsRequest = FindAutocompletePredictionsRequest.builder()
-                        .setTypeFilter(TypeFilter.ADDRESS)
+                        .setTypeFilter(TypeFilter.CITIES)
                         .setSessionToken(token)
                         .setQuery(s.toString())
                         .build();
+
                 placesClient.findAutocompletePredictions(predictionsRequest).addOnCompleteListener(new OnCompleteListener<FindAutocompletePredictionsResponse>() {
                     @Override
                     public void onComplete(@NonNull Task<FindAutocompletePredictionsResponse> task) {
@@ -168,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        materialSearchBar.setSuggestionsClickListener(new SuggestionsAdapter.OnItemViewClickListener() {
+        materialSearchBar.setSuggstionsClickListener(new SuggestionsAdapter.OnItemViewClickListener() {
             @Override
             public void OnItemClickListener(int position, View v) {
                 if (position >= predictionList.size()) {
@@ -188,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (imm != null)
                     imm.hideSoftInputFromWindow(materialSearchBar.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
                 final String placeId = selectedPrediction.getPlaceId();
-                List<Place.Field> placeFields = Arrays.asList(Place.Field.LAT_LNG);
+                List<Place.Field> placeFields = Arrays.asList(Place.Field.ID,Place.Field.NAME,Place.Field.LAT_LNG);
 
                 FetchPlaceRequest fetchPlaceRequest = FetchPlaceRequest.builder(placeId, placeFields).build();
                 placesClient.fetchPlace(fetchPlaceRequest).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
@@ -198,7 +204,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.i("mytag", "Place found: " + place.getName());
                         LatLng latLngOfPlace = place.getLatLng();
                         if (latLngOfPlace != null) {
+                            rippleBg.startRippleAnimation();
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOfPlace, DEFAULT_ZOOM));
+                            rippleBg.startRippleAnimation();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -274,8 +282,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onMyLocationButtonClick() {
                 if (materialSearchBar.isSuggestionsVisible())
                     materialSearchBar.clearSuggestions();
-                if (materialSearchBar.isSearchOpened())
-                    materialSearchBar.closeSearch();
+                if (materialSearchBar.isSearchEnabled())
+                    materialSearchBar.disableSearch();
                 return false;
             }
         });
